@@ -1,0 +1,123 @@
+/*  start auth */
+.LoginPage {
+  padding: 100px 0;
+}
+
+/* .LoginNoti {
+  padding: 0;
+} */
+
+/* .LoginPage h2 {
+  font-size: 22px;
+  font-weight: bold;
+} */
+
+.LoginPage button {
+  background-color: transparent;
+  /* border: none; */
+  display: block;
+}
+
+.search-section {
+  position: relative;
+  padding: 5px;
+  /* margin-bottom: 20px; */
+}
+
+.input-div {
+  text-align: center;
+  border: 1px solid var(--border_color);
+  color: var(--border_color);
+  width: 28%;
+  margin: 30px auto;
+  border-radius: 25px;
+  -webkit-border-radius: 25px;
+  -moz-border-radius: 25px;
+  -ms-border-radius: 25px;
+  -o-border-radius: 25px;
+}
+
+.input-div input {
+  width: 80%;
+  margin: 5px;
+  color: var(--border_color);
+  background-color: transparent;
+  border: none;
+}
+
+.LoginNoti .input-div {
+  width: 90%;
+}
+
+.search-section input:focus {
+  border: none;
+  outline: none;
+}
+
+.submit-button {
+  cursor: pointer;
+  background-color: var(--border_color) !important;
+  color: white;
+  border: 1px solid var(--border_color);
+  display: block;
+  width: 28%;
+  margin: 0 auto;
+  padding: 15px;
+  border-radius: 30px;
+  -webkit-border-radius: 30px;
+  -moz-border-radius: 30px;
+  -ms-border-radius: 30px;
+  -o-border-radius: 30px;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.search-section span {
+  font-size: 20px;
+  margin: 5px;
+}
+
+@media (min-width: 10px) and (max-width: 765.98px) {
+  .input-div {
+    width: 90%;
+  }
+
+  .submit-button {
+    width: 90%;
+  }
+
+  .LoginNoti .input-div {
+    width: 100%;
+  }
+}
+
+.LoginNoti .submit-button {
+  width: 70%;
+}
+.inputFormik {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  /* align-items: center; */
+}
+.p-inputtext {
+  width: 100%;
+}
+
+.Login-card {
+  background-color: white;
+  padding: 30px 20px !important;
+  border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+  width: fit-content;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  box-shadow: 1px 1px 20px 20px #eee;
+}
+.Login-card label {
+  margin-bottom: 5px;
+}
