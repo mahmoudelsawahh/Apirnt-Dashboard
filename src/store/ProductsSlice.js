@@ -609,6 +609,37 @@ export const DeleteOptions = createAsyncThunk(
   }
 );
 
+
+
+export const UpdateOptions = createAsyncThunk(
+  "products/UpdateOptions",
+  async (resD, thunkAPI) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const data = await axios
+        .post(
+          `${process.env.REACT_APP_BACKEND_API}dashboard/options/${resD.product_id}`,
+          { ...resD },
+          {
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${Cookies.get("Aprint_Dash_Token")}`,
+            },
+          }
+        )
+        .then((res) => res.data);
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
+
+
+
+
 const ProductsSlice = createSlice({
   name: "products",
   initialState: {
@@ -889,6 +920,19 @@ const ProductsSlice = createSlice({
     },
 
     [DeleteOptions.rejected]: (state, action) => {
+      state.isProductLoading = false;
+    },
+
+    //update options
+
+      [UpdateOptions.pending]: (state, action) => {
+      state.isProductLoading = true;
+    },
+    [UpdateOptions.fulfilled]: (state, action) => {
+      state.isProductLoading = false;
+    },
+
+    [UpdateOptions.rejected]: (state, action) => {
       state.isProductLoading = false;
     },
   },

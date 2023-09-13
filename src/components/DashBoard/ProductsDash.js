@@ -27,6 +27,7 @@ import {
   // Deletefooter,
   UPdateProduct,
   UpdateFooter,
+  UpdateOptions,
   getOneProduct,
   getProducts,
 } from "../../store/ProductsSlice";
@@ -35,6 +36,7 @@ import { Message } from "primereact/message";
 import { Button } from "primereact/button";
 import { CgEye } from "react-icons/cg";
 import { InputNumber } from "primereact/inputnumber";
+import Cookies from "js-cookie";
 const modules = {
   toolbar: [
     [{ header: [1, 2, 3, 4, 5, 6, false] }],
@@ -585,6 +587,7 @@ const ProductsDash = () => {
   const [OptionTabel, setOptionTabel] = useState([]);
   const [Section_id, setSection_id] = useState(null);
   const [option_type, setOption_type] = useState(null);
+  const [SelectOption , setSelectOption] = useState(null)
   const ClearOptions = () => {
     setOptionDialog(false);
     setOptionTitle("");
@@ -596,6 +599,9 @@ const ProductsDash = () => {
     setOption_type(null);
     CleaderSections();
   };
+
+
+
   const OptionBody = (rowData) => {
     return (
       <div className={styles.TB_Content} style={{ justifyContent: "center" }}>
@@ -603,6 +609,32 @@ const ProductsDash = () => {
           className={`${styles.TabelButton} ${styles.Edite}`}
           onClick={() => {
             setOptionDialog(true);
+            if (rowData.options) {
+              setOptionTabel(rowData.options);
+              setSection_id(rowData.id);
+            }
+          }}
+        >
+          <CgEye />
+        </button>
+      </div>
+    );
+  };
+
+  const RealOptionBody = (rowData) => {
+    return (
+      <div className={styles.TB_Content} style={{ justifyContent: "center" }}>
+        <button
+          className={`${styles.TabelButton} ${styles.Edite}`}
+          onClick={() => {
+            setOptionDialog(true);
+            setSelectOption(rowData)
+            setOptionTitle(rowData.name)
+            setOptionPrice(rowData.price)
+            setOptionDescription(rowData.description)
+            setOptionImage(rowData.image)
+            setSection_id(rowData.section_id)
+             setProductId(rowData.id)
             if (rowData.options) {
               setOptionTabel(rowData.options);
               setSection_id(rowData.id);
@@ -644,6 +676,7 @@ const ProductsDash = () => {
       dispatch(AddOptions(data))
         .unwrap()
         .then((res) => {
+          
           if (res.success) {
             showSuccess();
             ClearOptions();
@@ -676,6 +709,67 @@ const ProductsDash = () => {
       </div>
     );
   };
+
+
+
+// const updateOption = ()=>{
+//   fetch(`https://phplaravel-956370-3605842.cloudwaysapps.com/api/dashboard/options/${ProductID}`,{
+//     method : 'post',
+//     headers : {
+//       Accept: "application/json",
+//       'Content-Type': 'application/json',
+//       Authorization: `Bearer ${Cookies.get("Aprint_Dash_Token")}`,
+//     },
+//     body : JSON.stringify({
+//       "_method" : 'put',
+//       "name": OptionTitle,
+//       "price": OptionPrice,
+//       "description":  OptionDescription,
+//       "image": "sssssssssss",
+ 
+//      })
+
+//   })
+//   .then((res)=> res.json()).then((data)=> console.log(data))
+// }
+
+
+
+
+
+const updateOption = () => {
+  if (OptionTitle.length <= 0 || !option_type) {
+    showError("Check name and Price Type");
+  } else {
+    const data = {
+      "_method" : 'put',
+      name: OptionTitle,
+      price: OptionPrice,
+      description: OptionDescription,
+      image: OptionImage,
+      type: option_type.id,
+      product_id: ProductID,
+    };
+    dispatch(UpdateOptions(data))
+      .unwrap()
+      .then((res) => {
+        
+        if (res.success) {
+          showSuccess();
+          ClearOptions();
+        } else {
+          showError("something Went wrong");
+        }
+      });
+  }
+};
+
+
+
+
+
+
+
   return (
     <>
       <Toast ref={toast} />
@@ -1237,7 +1331,117 @@ const ProductsDash = () => {
             ClearOptions();
           }}
         >
-          <h1 className="main-two">Add Option</h1>
+
+        
+        {
+          SelectOption ?
+            <>
+            <h1 className="main-two">edit option</h1>
+          <form
+            className={`grid justify-content-center align-items-center ${styles.Dialog_Div}`}
+          >
+            <div className="col-12 md:col-4 mt-5">
+              <span className="p-float-label w-full">
+                <InputText
+                  className={`${OptionTitle.length <= 0 ? "p-invalid" : ""}`}
+                  id="OptionTitle"
+                  value={OptionTitle}
+                  onChange={(e) => setOptionTitle(e.target.value)}
+                />
+                <label htmlFor="OptionTitle"> Title</label>
+              </span>
+            </div>
+
+            <div className="col-12 md:col-4  mt-5">
+              <span className="p-float-label">
+                <InputNumber
+                  minFractionDigits={2}
+                  maxFractionDigits={5}
+                  id="OptionPrice"
+                  value={OptionPrice}
+                  // className={`${!OptionPrice ? "p-invalid" : ""} `}
+                  onValueChange={(e) => setOptionPrice(e.value)}
+                  rows={5}
+                  cols={30}
+                />
+                <label htmlFor="OptionPrice"> Price </label>
+              </span>
+            </div>
+            <div className="col-12 md:col-4  mt-5">
+              <span className="p-float-label">
+                <Dropdown
+                  id="Option_Price_Type"
+                  value={option_type}
+                  onChange={(e) => {
+                    setOption_type(e.value);
+                  }}
+                  options={OptionsType}
+                  
+                  optionLabel="name"
+                  placeholder="Select Price Type"
+                  className={`${!option_type ? "p-invalid" : ""} w-full`}
+                />
+                <label htmlFor="Price Type">Price Type </label>
+              </span>
+            </div>
+            <div className="col-12   mt-5">
+              <span className="p-float-label">
+                <InputText
+                  id="OptionDescription"
+                  value={OptionDescription}
+                  // className={`${
+                  //   OptionDescription.length <= 0 ? "p-invalid" : ""
+                  // } `}
+                  onChange={(e) => setOptionDescription(e.target.value)}
+                  rows={5}
+                  cols={30}
+                />
+                <label htmlFor="OptionDescription"> Description </label>
+              </span>
+            </div>
+            <div className="col-12  mt-5">
+              <div
+                className={styles.change_store_image}
+                style={{ borderColor: !OptionImage ? "red" : "#666d92" }}
+              >
+                <input
+                  type="file"
+                  style={{ display: "none" }}
+                  id="storeImage"
+                  name="storeImage"
+                  accept="image/*"
+                  // multiple={true}
+                  onChange={(e) => {
+                    setOptionImage(e.target.files[0]);
+                  }}
+                />
+                <label htmlFor="storeImage">
+                  {" "}
+                  <span className="icon-contact_mail"></span>
+                </label>
+                <label htmlFor="storeImage"> Click to select the image</label>
+                <label htmlFor="storeImage">Browse files</label>
+              </div>
+            </div>
+            {OptionImage && (
+              <div className="col-12 text-center">
+                <Message severity="success" text="Selected Image" />
+              </div>
+            )}
+          </form>
+          <div className="flex justify-content-center align-items-center">
+            <button
+              className={`${styles.addBTN} mt-5 text-center`}
+              onClick={(id) => updateOption(id)}
+            >
+              edit
+            </button>
+          </div>
+
+            </>
+           : 
+           <>
+           <h1 className="main-two">Add Option</h1>
           <form
             className={`grid justify-content-center align-items-center ${styles.Dialog_Div}`}
           >
@@ -1339,6 +1543,22 @@ const ProductsDash = () => {
             </button>
           </div>
 
+           </>
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
           <DataTable
             paginator
             selectionMode="single"
@@ -1351,6 +1571,7 @@ const ProductsDash = () => {
             responsiveLayout="scroll"
             tableStyle={{ minWidth: "50rem" }}
             rows={10}
+            
           >
             <Column field="name" header=" Name " style={{ maxWidth: "7rem" }} />
             <Column
@@ -1368,11 +1589,11 @@ const ProductsDash = () => {
               header=" Image "
               style={{ maxWidth: "7rem" }}
             />
-            {/* <Column
-              body={OptionBody}
+            <Column
+              body={RealOptionBody}
               header=" Option "
               style={{ maxWidth: "7rem" }}
-            /> */}
+            />
             <Column
               header=" Status "
               body={optionsStatusBody}
