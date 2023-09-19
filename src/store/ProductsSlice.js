@@ -637,6 +637,31 @@ export const UpdateOptions = createAsyncThunk(
 );
 
 
+export const AddNestedOfOptions = createAsyncThunk(
+  "products/AddNestedOfOptions",
+  async (resD, thunkAPI) => {
+    const { rejectWithValue } = thunkAPI;
+    try {
+      const data = await axios
+        .post(
+          `${process.env.REACT_APP_BACKEND_API}dashboard/options`,
+          { ...resD },
+          {
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${Cookies.get("Aprint_Dash_Token")}`,
+            },
+          }
+        )
+        .then((res) => res.data);
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
 
 
 
@@ -933,6 +958,19 @@ const ProductsSlice = createSlice({
     },
 
     [UpdateOptions.rejected]: (state, action) => {
+      state.isProductLoading = false;
+    },
+
+    //Add Sub option
+
+    [AddNestedOfOptions.pending]: (state, action) => {
+      state.isProductLoading = true;
+    },
+    [AddNestedOfOptions.fulfilled]: (state, action) => {
+      state.isProductLoading = false;
+    },
+
+    [AddNestedOfOptions.rejected]: (state, action) => {
       state.isProductLoading = false;
     },
   },

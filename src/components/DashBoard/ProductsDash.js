@@ -17,6 +17,7 @@ import "react-quill/dist/quill.snow.css";
 import {
   // AddFooter,
   AddHeader,
+  AddNestedOfOptions,
   AddOptions,
   AddProduct,
   AddSection,
@@ -503,6 +504,10 @@ const ProductsDash = () => {
     setSectionOrder("1");
     setSectionTabel([]);
     setProductId(null);
+    setSelectOption(null)
+    setAddNestedOfOption(false)
+
+
   };
   const SectionsBody = (rowData) => {
     return (
@@ -588,6 +593,7 @@ const ProductsDash = () => {
   const [Section_id, setSection_id] = useState(null);
   const [option_type, setOption_type] = useState(null);
   const [SelectOption , setSelectOption] = useState(null)
+  const [AddNestedOfOption , setAddNestedOfOption] = useState(false)
   const ClearOptions = () => {
     setOptionDialog(false);
     setOptionTitle("");
@@ -598,7 +604,10 @@ const ProductsDash = () => {
     setSection_id(null);
     setOption_type(null);
     CleaderSections();
+    setSelectOption(null)
+    setAddNestedOfOption(false)
   };
+
 
 
 
@@ -611,6 +620,7 @@ const ProductsDash = () => {
             setOptionDialog(true);
             if (rowData.options) {
               setOptionTabel(rowData.options);
+              console.log(rowData.options)
               setSection_id(rowData.id);
             }
           }}
@@ -628,6 +638,7 @@ const ProductsDash = () => {
           className={`${styles.TabelButton} ${styles.Edite}`}
           onClick={() => {
             setOptionDialog(true);
+            setAddNestedOfOption(false)
             setSelectOption(rowData)
             setOptionTitle(rowData.name)
             setOptionPrice(rowData.price)
@@ -647,6 +658,25 @@ const ProductsDash = () => {
     );
   };
 
+  const AddListOption = (rowData) => {
+    return (
+      <div className={styles.TB_Content} style={{ justifyContent: "center" }}>
+        <button
+          className={`${styles.TabelButton} ${styles.Edite}`}
+          onClick={() => {
+          setAddNestedOfOption(true);
+          setProductId(rowData.id)
+          setOptionTabel(rowData.childrens)
+          console.log(OptionTabel)
+          }}
+        >
+          <CgEye />
+        </button>
+      </div>
+    );
+  };
+
+
   const OptionImageBody = (rowData) => {
     return (
       <>
@@ -655,12 +685,16 @@ const ProductsDash = () => {
     );
   };
 
+  
+
+
   const OptionsType = [
     { name: "Price $", id: 1 },
     { name: "Percent %", id: 2 },
   ];
 
   const CreateOption = () => {
+    setAddNestedOfOption(false)
     if (OptionTitle.length <= 0 || !option_type) {
       showError("Check name and Price Type");
     } else {
@@ -711,32 +745,6 @@ const ProductsDash = () => {
   };
 
 
-
-// const updateOption = ()=>{
-//   fetch(`https://phplaravel-956370-3605842.cloudwaysapps.com/api/dashboard/options/${ProductID}`,{
-//     method : 'post',
-//     headers : {
-//       Accept: "application/json",
-//       'Content-Type': 'application/json',
-//       Authorization: `Bearer ${Cookies.get("Aprint_Dash_Token")}`,
-//     },
-//     body : JSON.stringify({
-//       "_method" : 'put',
-//       "name": OptionTitle,
-//       "price": OptionPrice,
-//       "description":  OptionDescription,
-//       "image": "sssssssssss",
- 
-//      })
-
-//   })
-//   .then((res)=> res.json()).then((data)=> console.log(data))
-// }
-
-
-
-
-
 const updateOption = () => {
   if (OptionTitle.length <= 0 || !option_type) {
     showError("Check name and Price Type");
@@ -763,6 +771,38 @@ const updateOption = () => {
       });
   }
 };
+
+const AddSubOptions = () => {
+  if (OptionTitle.length <= 0 || !option_type) {
+    showError("Check name and Price Type");
+  } else {
+    const data = {
+      name: OptionTitle,
+      price: OptionPrice,
+      description: OptionDescription,
+      image: OptionImage,
+      type: option_type.id,
+      parent_id: ProductID,
+      
+    };
+    dispatch(AddNestedOfOptions(data))
+      .unwrap()
+      .then((res) => {
+        
+        if (res.success) {
+          showSuccess();
+          ClearOptions();
+        } else {
+          showError("something Went wrong");
+        }
+      });
+  }
+};
+
+
+
+
+
 
 
 
@@ -1126,6 +1166,11 @@ const updateOption = () => {
               header=" Name "
               style={{ maxWidth: "7rem" }}
             />
+              <Column
+              field="title"
+              header=" Name "
+              style={{ maxWidth: "7rem" }}
+            />
             <Column
               field="description"
               header=" Description "
@@ -1154,33 +1199,7 @@ const updateOption = () => {
           <form
             className={`grid justify-content-center align-items-center ${styles.Dialog_Div}`}
           >
-            {/* <div className="col-12 mt-5">
-              <span className="p-float-label w-full">
-                <InputText
-                  className={`${FooterTitle.length <= 0 ? "p-invalid" : ""}`}
-                  id="FooterTitle"
-                  value={FooterTitle}
-                  onChange={(e) => setFooterTitle(e.target.value)}
-                />
-                <label htmlFor="FooterTitle"> Title</label>
-              </span>
-            </div> */}
-
-            {/* <div className="col-12  mt-5">
-              <span className="p-float-label">
-                <InputTextarea
-                  id="Footerdescription"
-                  value={Footerdescription}
-                  className={`${
-                    Footerdescription.length <= 0 ? "p-invalid" : ""
-                  } `}
-                  onChange={(e) => setFooterDescription(e.target.value)}
-                  rows={5}
-                  cols={30}
-                />
-                <label htmlFor="Footerdescription"> Description </label>
-              </span>
-            </div> */}
+            
             <div className="col-12">
               <ReactQuill
                 style={{
@@ -1202,37 +1221,6 @@ const updateOption = () => {
               Save
             </button>
           </div>
-
-          {/* <DataTable
-            paginator
-            selectionMode="single"
-            value={FooterTabel}
-            className={`${styles.dataTabel}`}
-            dataKey="id"
-            scrollable
-            scrollHeight="100vh"
-            filterDisplay="row"
-            responsiveLayout="scroll"
-            tableStyle={{ minWidth: "50rem" }}
-            rows={10}
-          >
-            <Column
-              field="title"
-              header=" Name "
-              style={{ maxWidth: "7rem" }}
-            />
-            <Column
-              field="description"
-              header=" Description "
-              style={{ maxWidth: "7rem" }}
-            />
-
-            <Column
-              header=" Status "
-              body={FootertatusBody}
-              style={{ maxWidth: "7rem" }}
-            />
-          </DataTable> */}
         </Dialog>
 
         <Dialog
@@ -1270,21 +1258,6 @@ const updateOption = () => {
                 <label htmlFor="SectionOrder"> Section Order </label>
               </span>
             </div>
-
-            {/* <div className="col-12 mt-5">
-              <span className="p-float-label">
-                <Dropdown
-                  value={SectionType}
-                  onChange={(e) => setSectionType(e.value)}
-                  options={statusMenu}
-                  optionLabel="name"
-                  placeholder=" type"
-                  className={`${!SectionType ? "p-invalid" : ""} w-full`}
-                  // className="w-full md:w-14rem"
-                />
-                <label htmlFor="type"> type </label>
-              </span>
-            </div> */}
           </form>
           <div className="flex justify-content-center align-items-center">
             <button
@@ -1321,6 +1294,7 @@ const updateOption = () => {
               body={SectionStatusBody}
               style={{ maxWidth: "7rem" }}
             />
+            
           </DataTable>
         </Dialog>
 
@@ -1332,8 +1306,117 @@ const updateOption = () => {
           }}
         >
 
+
+            {/* ------------------------------------------------------------- */}
+
+
         
         {
+          AddNestedOfOption ?  
+          <>
+            <h1 className="main-two">Add List Of Option</h1>
+          <form
+            className={`grid justify-content-center align-items-center ${styles.Dialog_Div}`}
+          >
+            <div className="col-12 md:col-4 mt-5">
+              <span className="p-float-label w-full">
+                <InputText
+                  className={`${OptionTitle.length <= 0 ? "p-invalid" : ""}`}
+                  id="OptionTitle"
+                  value={OptionTitle}
+                  onChange={(e) => setOptionTitle(e.target.value)}
+                />
+                <label htmlFor="OptionTitle"> Title</label>
+              </span>
+            </div>
+
+            <div className="col-12 md:col-4  mt-5">
+              <span className="p-float-label">
+                <InputNumber
+                  minFractionDigits={2}
+                  maxFractionDigits={5}
+                  id="OptionPrice"
+                  value={OptionPrice}
+                  // className={`${!OptionPrice ? "p-invalid" : ""} `}
+                  onValueChange={(e) => setOptionPrice(e.value)}
+                  rows={5}
+                  cols={30}
+                />
+                <label htmlFor="OptionPrice"> Price </label>
+              </span>
+            </div>
+            <div className="col-12 md:col-4  mt-5">
+              <span className="p-float-label">
+                <Dropdown
+                  id="Option_Price_Type"
+                  value={option_type}
+                  onChange={(e) => {
+                    setOption_type(e.value);
+                  }}
+                  options={OptionsType}
+                  
+                  optionLabel="name"
+                  placeholder="Select Price Type"
+                  className={`${!option_type ? "p-invalid" : ""} w-full`}
+                />
+                <label htmlFor="Price Type">Price Type </label>
+              </span>
+            </div>
+            <div className="col-12   mt-5">
+              <span className="p-float-label">
+                <InputText
+                  id="OptionDescription"
+                  value={OptionDescription}
+                  // className={`${
+                  //   OptionDescription.length <= 0 ? "p-invalid" : ""
+                  // } `}
+                  onChange={(e) => setOptionDescription(e.target.value)}
+                  rows={5}
+                  cols={30}
+                />
+                <label htmlFor="OptionDescription"> Description </label>
+              </span>
+            </div>
+            <div className="col-12  mt-5">
+              <div
+                className={styles.change_store_image}
+                style={{ borderColor: !OptionImage ? "red" : "#666d92" }}
+              >
+                <input
+                  type="file"
+                  style={{ display: "none" }}
+                  id="storeImage"
+                  name="storeImage"
+                  accept="image/*"
+                  // multiple={true}
+                  onChange={(e) => {
+                    setOptionImage(e.target.files[0]);
+                  }}
+                />
+                <label htmlFor="storeImage">
+                  {" "}
+                  <span className="icon-contact_mail"></span>
+                </label>
+                <label htmlFor="storeImage"> Click to select the image</label>
+                <label htmlFor="storeImage">Browse files</label>
+              </div>
+            </div>
+            {OptionImage && (
+              <div className="col-12 text-center">
+                <Message severity="success" text="Selected Image" />
+              </div>
+            )}
+          </form>
+          <div className="flex justify-content-center align-items-center">
+            <button
+              className={`${styles.addBTN} mt-5 text-center`}
+              onClick={(id) => AddSubOptions(id)}
+            >
+              Add Sub Option
+            </button>
+          </div>
+            </>
+           : 
           SelectOption ?
             <>
             <h1 className="main-two">edit option</h1>
@@ -1543,22 +1626,8 @@ const updateOption = () => {
             </button>
           </div>
 
-           </>
+           </> 
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
           <DataTable
             paginator
             selectionMode="single"
@@ -1595,12 +1664,23 @@ const updateOption = () => {
               style={{ maxWidth: "7rem" }}
             />
             <Column
+              body={AddListOption}
+              header=" list Option "
+              style={{ maxWidth: "7rem" }}
+            />
+            <Column
               header=" Status "
               body={optionsStatusBody}
               style={{ maxWidth: "7rem" }}
-            />
+            />            
           </DataTable>
         </Dialog>
+
+
+
+
+
+        
       </div>
     </>
   );
