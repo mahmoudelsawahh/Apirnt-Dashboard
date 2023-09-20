@@ -667,7 +667,6 @@ const ProductsDash = () => {
           setAddNestedOfOption(true);
           setProductId(rowData.id)
           setOptionTabel(rowData.childrens)
-          console.log(OptionTabel)
           }}
         >
           <CgEye />
