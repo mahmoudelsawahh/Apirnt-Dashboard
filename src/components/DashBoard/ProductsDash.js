@@ -783,7 +783,6 @@ const AddSubOptions = () => {
       const data = {
         name: OptionTitle,
         price: OptionPrice,
-        description: OptionDescription,
         image: OptionImage,
         type: option_type.id,
         parent_id: ProductID,
@@ -1386,21 +1385,7 @@ const AddSubOptions = () => {
                 <label htmlFor="Price Type">Price Type </label>
               </span>
             </div>
-            <div className="col-12   mt-5">
-              <span className="p-float-label">
-                <InputText
-                  id="OptionDescription"
-                  value={OptionDescription}
-                  // className={`${
-                  //   OptionDescription.length <= 0 ? "p-invalid" : ""
-                  // } `}
-                  onChange={(e) => setOptionDescription(e.target.value)}
-                  rows={5}
-                  cols={30}
-                />
-                <label htmlFor="OptionDescription"> Description </label>
-              </span>
-            </div>
+   
             <div className="col-12  mt-5">
               <div
                 className={styles.change_store_image}
