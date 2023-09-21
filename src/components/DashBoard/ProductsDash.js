@@ -69,7 +69,7 @@ const ProductsDash = () => {
   const dispatch = useDispatch();
   const { Products } = useSelector((state) => state.ProductsSlice);
   const { proCateg } = useSelector((state) => state.CategoriesSlice);
-
+  const [OptionsNum , setOptionsNum] = useState(0)
   useEffect(() => {
     if (!Products) {
       dispatch(getProducts());
@@ -328,6 +328,7 @@ const ProductsDash = () => {
     Setdef_height(null);
     setmeta_title("");
     setmeta_description("");
+    setOptionsNum(0)
   };
 
   // ProductID
@@ -506,6 +507,7 @@ const ProductsDash = () => {
     setProductId(null);
     setSelectOption(null)
     setAddNestedOfOption(false)
+    setOptionsNum(0)
 
 
   };
@@ -606,6 +608,7 @@ const ProductsDash = () => {
     CleaderSections();
     setSelectOption(null)
     setAddNestedOfOption(false)
+    setOptionsNum(0)
   };
 
 
@@ -664,6 +667,7 @@ const ProductsDash = () => {
         <button
           className={`${styles.TabelButton} ${styles.Edite}`}
           onClick={() => {
+           setOptionsNum(OptionsNum+1)
           setAddNestedOfOption(true);
           setProductId(rowData.id)
           setOptionTabel(rowData.childrens)
@@ -772,15 +776,34 @@ const updateOption = () => {
 };
 
 const AddSubOptions = () => {
-  if (OptionTitle.length <= 0 || !option_type) {
-    showError("Check name and Price Type");
-  } else {
+   if(OptionsNum > 1){
+    if (OptionTitle.length <= 0 || !option_type) {
+      showError("Check name and Price Type");
+    } else {
+      const data = {
+        name: OptionTitle,
+        price: OptionPrice,
+        description: OptionDescription,
+        image: OptionImage,
+        type: option_type.id,
+        parent_id: ProductID,
+        
+      };
+      dispatch(AddNestedOfOptions(data))
+        .unwrap()
+        .then((res) => {
+          
+          if (res.success) {
+            showSuccess();
+            ClearOptions();
+          } else {
+            showError("something Went wrong");
+          }
+        });
+   }
+  }else{
     const data = {
       name: OptionTitle,
-      price: OptionPrice,
-      description: OptionDescription,
-      image: OptionImage,
-      type: option_type.id,
       parent_id: ProductID,
       
     };
@@ -1313,8 +1336,10 @@ const AddSubOptions = () => {
         {
           AddNestedOfOption ?  
           <>
+           {OptionsNum > 1 ? 
+            <>
             <h1 className="main-two">Add List Of Option</h1>
-          <form
+            <form
             className={`grid justify-content-center align-items-center ${styles.Dialog_Div}`}
           >
             <div className="col-12 md:col-4 mt-5">
@@ -1406,6 +1431,27 @@ const AddSubOptions = () => {
               </div>
             )}
           </form>
+            </>
+           : 
+            <>
+                <h1 className="main-two">Add Option title</h1>
+                <form
+                className={`grid justify-content-center align-items-center ${styles.Dialog_Div}`}
+              >
+                <div className="col-12">
+                  <span className="p-float-label w-full">
+                    <InputText
+                      className={`${OptionTitle.length <= 0 ? "p-invalid" : ""}`}
+                      id="OptionTitle"
+                      value={OptionTitle}
+                      onChange={(e) => setOptionTitle(e.target.value)}
+                    />
+                    <label htmlFor="OptionTitle"> Title</label>
+                  </span>
+                </div>
+              </form>
+            </>
+           }
           <div className="flex justify-content-center align-items-center">
             <button
               className={`${styles.addBTN} mt-5 text-center`}
@@ -1627,7 +1673,40 @@ const AddSubOptions = () => {
 
            </> 
         }
+         {OptionsNum === 1 ? 
           <DataTable
+            paginator
+            selectionMode="single"
+            value={OptionTabel}
+            className={`${styles.dataTabel}`}
+            dataKey="id"
+            scrollable
+            scrollHeight="100vh"
+            filterDisplay="row"
+            responsiveLayout="scroll"
+            tableStyle={{ minWidth: "50rem" }}
+            rows={10}
+            
+          >
+            <Column field="name" header=" Title " style={{ maxWidth: "7rem" }} />
+            <Column
+              body={RealOptionBody}
+              header=" Option "
+              style={{ maxWidth: "7rem" }}
+            />
+            <Column
+              body={AddListOption}
+              header=" list Option "
+              style={{ maxWidth: "7rem" }}
+            />
+            <Column
+              header=" Status "
+              body={optionsStatusBody}
+              style={{ maxWidth: "7rem" }}
+            />            
+          </DataTable>
+         :
+         <DataTable
             paginator
             selectionMode="single"
             value={OptionTabel}
@@ -1673,6 +1752,7 @@ const AddSubOptions = () => {
               style={{ maxWidth: "7rem" }}
             />            
           </DataTable>
+         }
         </Dialog>
 
 
