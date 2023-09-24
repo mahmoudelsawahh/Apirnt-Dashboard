@@ -752,12 +752,23 @@ const updateOption = () => {
   if (OptionTitle.length <= 0 || !option_type) {
     showError("Check name and Price Type");
   } else {
-    const data = {
+    const data = OptionImage ? 
+    {
       "_method" : 'put',
       name: OptionTitle,
       price: OptionPrice,
       description: OptionDescription,
       image: OptionImage,
+      type: option_type.id,
+      product_id: ProductID,
+    }
+    :
+    {
+      "_method" : 'put',
+      name: OptionTitle,
+      price: OptionPrice,
+      description: OptionDescription,
+      // image: OptionImage,
       type: option_type.id,
       product_id: ProductID,
     };
